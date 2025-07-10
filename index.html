@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+ <head> 
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"> 
+  <title>Nova2048</title> 
+  <style>
+        body {font-family: 'Arial', sans-serif; background: #faf8ef; margin: 0; display: flex; flex-direction: column; align-items: center; padding: 20px;}
+        #title {font-size: 8vmin; color: #776e65; margin-bottom: 10px;}
+        #header {width: 90vmin; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;}
+        #score-container, #best-container {background: #bbada0; color: #f9f6f2; padding: 10px 20px; border-radius: 3px; font-size: 4vmin; font-weight: bold;}
+        #new-game {padding: 10px 20px; font-size: 3vmin; border: none; border-radius: 3px; background: #8f7a66; color: #f9f6f2; cursor: pointer;}
+        #game-container {width: 90vmin; height: 90vmin; background: #bbada0; padding: 10px; border-radius: 6px; position: relative; touch-action: none;}
+        .grid-cell, .tile {width: calc((100% - 50px) / 4); height: calc((100% - 50px) / 4); border-radius: 3px; position: absolute; display: flex; justify-content: center; align-items: center;}
+        .grid-cell {background: #ccc0b3;}
+        .tile {transition: top 0.2s ease, left 0.2s ease, transform 0.2s ease-in-out;}
+        .tile-2 {background: #eee4da; color: #776e65; font-size: 6vmin;}
+        .tile-4 {background: #ede0c8; color: #776e65; font-size: 6vmin;}
+        .tile-8 {background: #f2b179; color: #f9f6f2; font-size: 6vmin;}
+        .tile-16 {background: #f59563; color: #f9f6f2; font-size: 5vmin;}
+        .tile-32 {background: #f67c5f; color: #f9f6f2; font-size: 5vmin;}
+        .tile-64 {background: #f65e3b; color: #f9f6f2; font-size: 5vmin;}
+        .tile-128 {background: #edcf72; color: #f9f6f2; font-size: 4vmin;}
+        .tile-256 {background: #edcc61; color: #f9f6f2; font-size: 4vmin;}
+        .tile-512 {background: #edc850; color: #f9f6f2; font-size: 4vmin;}
+        .tile-1024 {background: #edc53f; color: #f9f6f2; font-size: 3vmin;}
+        .tile-2048 {background: #edc22e; color: #f9f6f2; font-size: 3vmin;}
+        .tile.merge {animation: pop 0.2s ease-in-out;}
+        @keyframes pop {0% {transform: scale(0.5);} 50% {transform: scale(1.2);} 100% {transform: scale(1);} }
+        #footer {margin-top: 15px; font-size: 2vmin; color: #bbb;}
+    </style> 
+  <script src="js/jq.js"></script> 
+ </head> 
+ <body id="v1"> 
+  <div id="title">
+    Nova2048 
+  </div> 
+  <div id="header"> 
+   <button id="new-game">新游戏</button> 
+   <div id="score-container">
+     分数: 
+    <span id="score">0</span> 
+   </div> 
+   <div id="best-container">
+     最高: 
+    <span id="best">4</span> 
+   </div> 
+  </div> 
+  <div id="game-container">
+   <div class="grid-cell" style="height: 73.5px; width: 73.5px; top: 10px; left: 10px;"></div>
+   <div class="grid-cell" style="height: 73.5px; width: 73.5px; top: 10px; left: 93.5px;"></div>
+   <div class="grid-cell" style="height: 73.5px; width: 73.5px; top: 10px; left: 177px;"></div>
+   <div class="grid-cell" style="height: 73.5px; width: 73.5px; top: 10px; left: 260.5px;"></div>
+   <div class="grid-cell" style="height: 73.5px; width: 73.5px; top: 93.5px; left: 10px;"></div>
+   <div class="grid-cell" style="height: 73.5px; width: 73.5px; top: 93.5px; left: 93.5px;"></div>
+   <div class="grid-cell" style="height: 73.5px; width: 73.5px; top: 93.5px; left: 177px;"></div>
+   <div class="grid-cell" style="height: 73.5px; width: 73.5px; top: 93.5px; left: 260.5px;"></div>
+   <div class="grid-cell" style="height: 73.5px; width: 73.5px; top: 177px; left: 10px;"></div>
+   <div class="grid-cell" style="height: 73.5px; width: 73.5px; top: 177px; left: 93.5px;"></div>
+   <div class="grid-cell" style="height: 73.5px; width: 73.5px; top: 177px; left: 177px;"></div>
+   <div class="grid-cell" style="height: 73.5px; width: 73.5px; top: 177px; left: 260.5px;"></div>
+   <div class="grid-cell" style="height: 73.5px; width: 73.5px; top: 260.5px; left: 10px;"></div>
+   <div class="grid-cell" style="height: 73.5px; width: 73.5px; top: 260.5px; left: 93.5px;"></div>
+   <div class="grid-cell" style="height: 73.5px; width: 73.5px; top: 260.5px; left: 177px;"></div>
+   <div class="grid-cell" style="height: 73.5px; width: 73.5px; top: 260.5px; left: 260.5px;"></div>
+   <div class="tile tile-2" style="height: 73.5px; width: 73.5px; top: 260.5px; left: 10px;">
+    2
+   </div>
+   <div class="tile tile-2" style="height: 73.5px; width: 73.5px; top: 260.5px; left: 93.5px;">
+    2
+   </div>
+  </div> 
+  <div id="footer">
+    © 2025 Plante Network Studio
+  </div> 
+  <script>
+    const SIZE =4;
+    let grid = [];
+    let score = 0;
+    let best = localStorage.getItem('2048-best') || 0;
+    const container = document.getElementById('game-container');
+    const scoreEl = document.getElementById('score');
+    const bestEl = document.getElementById('best');
+    const newGameBtn = document.getElementById('new-game');function updateScore(delta) {
+    score += delta;
+    scoreEl.textContent = score;
+    if (score > best) {
+        best = score;
+        bestEl.textContent = best;
+        localStorage.setItem('2048-best', best);
+    }
+}
+
+function setup() {
+    container.innerHTML = '';
+    score = 0;
+    scoreEl.textContent = score;
+    bestEl.textContent = best;
+    grid = Array.from({ length: SIZE }, () => Array(SIZE).fill(0));
+    // draw background
+    for (let r = 0; r < SIZE; r++) {
+        for (let c = 0; c < SIZE; c++) {
+            const cell = document.createElement('div');
+            cell.className = 'grid-cell';
+            position(cell, r, c);
+            container.appendChild(cell);
+        }
+    }
+    addRandom(); addRandom(); draw();
+}
+
+function position(elem, r, c) {
+    const gap = 10;
+    const size = (container.clientWidth - gap * (SIZE + 1)) / SIZE;
+    elem.style.width = elem.style.height = `${size}px`;
+    elem.style.top = `${gap + r * (size + gap)}px`;
+    elem.style.left = `${gap + c * (size + gap)}px`;
+}
+
+function addRandom() {
+    const empties = [];
+    for (let r = 0; r < SIZE; r++) for (let c = 0; c < SIZE; c++) if (!grid[r][c]) empties.push([r,c]);
+    if (!empties.length) return;
+    const [r,c] = empties[Math.floor(Math.random()*empties.length)];
+    grid[r][c] = Math.random()<0.9?2:4;
+}
+
+function draw() {
+    container.querySelectorAll('.tile').forEach(t => container.removeChild(t));
+    for (let r = 0; r < SIZE; r++) {
+        for (let c = 0; c < SIZE; c++) {
+            const val = grid[r][c];
+            if (!val) continue;
+            let tile = document.createElement('div');
+            tile.className = `tile tile-${val}`;
+            tile.textContent = val;
+            position(tile, r, c);
+            container.appendChild(tile);
+        }
+    }
+}
+
+function slideAndMerge(line) {
+    let arr = line.filter(v => v);
+    for (let i = 0; i < arr.length - 1; i++) {
+        if (arr[i] === arr[i+1]) {
+            arr[i] *= 2;
+            updateScore(arr[i]);
+            arr.splice(i+1,1);
+        }
+    }
+    return arr.concat(Array(SIZE - arr.length).fill(0));
+}
+
+function move(dir) {
+    let moved = false;
+    let merged = Array.from({ length: SIZE }, () => Array(SIZE).fill(false));
+    const vector = {'up':{x:-1,y:0},'down':{x:1,y:0},'left':{x:0,y:-1},'right':{x:0,y:1}}[dir];
+    const ranges = {x:[...Array(SIZE).keys()],y:[...Array(SIZE).keys()]};
+    if (dir==='down') ranges.x.reverse(); if (dir==='right') ranges.y.reverse();
+    for (let x of ranges.x) for (let y of ranges.y) {
+        if (!grid[x][y]) continue;
+        let nx=x,ny=y;
+        while (true) {
+            const tx=nx+vector.x, ty=ny+vector.y;
+            if (tx<0||tx>=SIZE||ty<0||ty>=SIZE) break;
+            if (!grid[tx][ty]) {
+                grid[tx][ty]=grid[nx][ny]; grid[nx][ny]=0; nx=tx; ny=ty; moved=true;
+            } else if (grid[tx][ty]===grid[nx][ny] && !merged[tx][ty]) {
+                grid[tx][ty]*=2; grid[nx][ny]=0; updateScore(grid[tx][ty]); merged[tx][ty]=true; moved=true; break;
+            } else break;
+        }
+    }
+    if (moved) {
+        addRandom(); draw();
+        merged.forEach((row,i)=>row.forEach((m,j)=>{
+            if (m) {
+                const tile = Array.from(container.querySelectorAll(`.tile-${grid[i][j]}`)).pop();
+                tile.classList.add('merge'); setTimeout(()=>tile.classList.remove('merge'),200);
+            }
+        }));
+    }
+}
+
+document.addEventListener('keydown', e=>{ const dirs={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right'}; if(dirs[e.key]) move(dirs[e.key]); });
+container.addEventListener('touchstart', e=>{ const t=e.changedTouches[0]; startX=t.clientX; startY=t.clientY; });
+container.addEventListener('touchend', e=>{ const t=e.changedTouches[0], dx=t.clientX-startX, dy=t.clientY-startY; if(Math.abs(dx)>Math.abs(dy)) dx>30?move('right'):dx<-30?move('left'):0; else dy>30?move('down'):dy<-30?move('up'):0; });
+newGameBtn.addEventListener('click', setup);
+window.addEventListener('resize', draw);
+setup();
+
+</script>  
+ </body>
+</html>
